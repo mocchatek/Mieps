@@ -26,6 +26,12 @@ export enum CommandType
 	Emoji
 }
 
+export interface EmbedMessage
+{
+	embeds: Array<Discord.MessageEmbed>;
+	files?: string[];
+}
+
 /** processes all incoming messages */
 export interface MessageStream
 {
@@ -171,7 +177,7 @@ export class Plugin implements iPlugin
 	/**
 	 * A plugins state persists between bot restarts, and holds the set-up settings.
 	 * It can also be used to store other information.
-	 * All values which are not volatile, should be sotred in the state!
+	 * All values which are not volatile, should be sorted in the state!
 	 */
 	state?: State;
 
@@ -196,7 +202,7 @@ export class Plugin implements iPlugin
 
 			criticalPluginError(
 				this.pluginManager.controlChannel,
-				`Tried to acess setting ${setting} while no state was set`,
+				`Tried to access setting ${setting} while no state was set`,
 				this
 			);
 
@@ -210,7 +216,7 @@ export class Plugin implements iPlugin
 
 			criticalPluginError(
 				this.pluginManager.controlChannel,
-				`Could not acess Setting ${setting}`,
+				`Could not access Setting ${setting}`,
 				this
 			);
 
@@ -240,7 +246,8 @@ export class Plugin implements iPlugin
 				else
 				{
 					// unicode Emoji
-					response = new Discord.Emoji( this.client, {id: null, name: s} );
+					// original code: response = new Discord.Emoji( this.client, {id: null, name: s} );
+					response = guild.emojis.cache.find((e: Discord.GuildEmoji) => e.name?.toLowerCase() === s.toLowerCase());
 				}
 
 			}
@@ -345,7 +352,7 @@ export class Plugin implements iPlugin
 
 			criticalPluginError(
 				this.pluginManager.controlChannel,
-				`Could not find any ${ InputType[type] } with the id ${s} on the server. Maybee it no longer exists? Reconfigure the plugin to fix this Error`,
+				`Could not find any ${ InputType[type] } with the id ${s} on the server. Maybe it no longer exists? Reconfigure the plugin to fix this Error`,
 				this
 			);
 

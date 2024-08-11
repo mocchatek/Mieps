@@ -1,11 +1,12 @@
 import * as Discord from "discord.js"
 
 import * as Lang from "../lang/embedMaker.js"
+import { EmbedMessage } from "./plugin.js";
 
 
 /**
  * creates a embed from a message
- * @param message message to create mebed from
+ * @param message message to create embed from
  * @param showUserIcon if the authors icon should be included
  * @param showUserName if the users name should be included
  * @param showTimestamp if the original message timestamp should be included
@@ -15,13 +16,13 @@ export async function embedFromMessage(
 	showUserIcon: boolean = true,
 	showUserName: boolean = true,
 	showTimestamp: boolean = true
-): Promise<Discord.MessageEmbed>
+): Promise<EmbedMessage>
 {
 	
 	// if the message is another bot embed, copy it
 	if (message.author.bot && message.embeds.length === 1 && message.content.trim() === "")
 	{
-		return message.embeds[0];
+		return { embeds: message.embeds.slice(0, 1) };
 	}
 
 	let embed = new Discord.MessageEmbed();
@@ -36,27 +37,14 @@ export async function embedFromMessage(
 
 	if (showUserName)
 	{
-
-		if (message.member !== null)
-		{
-			embed = embed.setAuthor( message.member.displayName, av ?? undefined );
-		}
-		else
-		{
-			embed = embed.setAuthor( message.author.username, av ?? undefined );
-		}
-
+		embed.author = {
+			name: message.member?.displayName ?? message.author.username,
+			iconURL: av ?? undefined
+		};
 	}
 	
 	// colorize embed
-	if (message.member !== null)
-	{
-		embed = embed.setColor( message.member.displayColor );
-	}
-	else
-	{
-		embed = embed.setColor('#ffffff');
-	}
+	embed = embed.setColor(message.member?.displayColor ?? '#ffffff');
 
 	// add content
 	embed = embed.setDescription( message.content );
@@ -69,10 +57,10 @@ export async function embedFromMessage(
 	// fetch reply and add preview text
 	let replyMsg: Discord.Message | null = null;
 
-	if (message.reference?.channelID === message.channel.id && message.reference.messageID)
+	if (message.reference?.channelId === message.channel.id && message.reference.messageId)
 	{
 		try {
-			replyMsg = await message.channel.messages.fetch( message.reference.messageID );
+			replyMsg = await message.channel.messages.fetch( message.reference.messageId );
 		}
 		catch {}
 		
@@ -102,14 +90,17 @@ export async function embedFromMessage(
 		}
 	}
 
+	const result = {} as EmbedMessage;
+
 	// reattach image
 	let attachment = message.attachments.first();
 
 	if (attachment && (attachment.width || attachment.height))
 	{
-		embed = embed.attachFiles( [ attachment.url ] )
-					 .setImage( `attachment://${attachment.name}` );
+		embed = embed.setImage( `attachment://${attachment.name}` );
+		result.files = [ attachment.url ];
 	}
 	
-	return embed;
+	result.embeds = [ embed ];
+	return result;
 }

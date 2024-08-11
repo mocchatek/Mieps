@@ -44,7 +44,7 @@ export function criticalPluginError(logChannel: Discord.TextChannel, errorMsg: s
 }
 
 /**
- * Report an error that happend while executing a plugin, but didn't crash it.
+ * Report an error that happened while executing a plugin, but didn't crash it.
  * This is best used with errors caused by commands.
  * @param logChannel channel to report error in
  * @param plugin plugin that threw the error

@@ -102,11 +102,9 @@ async function fetchSelected(
 		{
 			let newMessages = await channel.messages.fetch({ after: current.id });
 
-			newMessages = newMessages.sort( (a, b) => {
-
-				return a.createdTimestamp - b.createdTimestamp;
-
-			});
+			newMessages = newMessages.sort((a: Discord.Message, b: Discord.Message) =>
+				a.createdTimestamp - b.createdTimestamp
+			);
 
 			messages = messages.concat(newMessages);
 			current = newMessages.last() as Discord.Message;
@@ -115,8 +113,8 @@ async function fetchSelected(
 			if (!current) break;
 		}
 
-		// Filter all messages, which were psoted after the last message
-		messages = messages.filter( m => m.createdTimestamp <= end.createdTimestamp );
+		// Filter all messages, which were posted after the last message
+		messages = messages.filter((m: Discord.Message) => m.createdTimestamp <= end.createdTimestamp);
 	} catch {
 		return;
 	}
@@ -130,7 +128,7 @@ async function removeMarks(state: State, member: Discord.GuildMember): Promise<v
 	let oldStartR = state.read( member.id, "start" ) as SelectionMark | undefined;
 	let oldEndR = state.read( member.id, "end" ) as SelectionMark | undefined;
 
-	// Attempt to delte both
+	// Attempt to delete both
 	[ oldStartR, oldEndR ].forEach(async oldR => {
 
 		if (oldR)
@@ -150,11 +148,11 @@ async function removeMarks(state: State, member: Discord.GuildMember): Promise<v
 
 }
 
-async function embedArrayFromMessages(messages: Discord.Collection<string, Discord.Message>): Promise<Discord.MessageEmbed[]>
+async function embedArrayFromMessages(messages: Discord.Collection<string, Discord.Message>): Promise<Plugin.EmbedMessage[]>
 {
-	let embeds: Array<Discord.MessageEmbed> = [];
+	let embeds: Array<Plugin.EmbedMessage> = [];
 
-	for (const [key, m] of messages)
+	for (const [_, m] of messages)
 	{
 		let embed = await embedFromMessage(m);
 		embeds.push(embed)
@@ -186,9 +184,10 @@ class DeleteSingle extends Plugin.EmojiCommand
 		try
 		{
 			let message = reaction.message;
+			if (message.partial) message = await message.fetch();
 			let embed = await embedFromMessage(message);
 
-			await (logChannel as Discord.TextChannel).send( Lang.logMessage(member), embed );
+			await (logChannel as Discord.TextChannel).send({ ...embed, content: Lang.logMessage(member) });
 			await message.delete();
 		}
 		catch
@@ -221,9 +220,10 @@ class CopySingle extends Plugin.EmojiCommand
 		try
 		{
 			let message = reaction.message;
+			if (message.partial) message = await message.fetch();
 			let embed = await embedFromMessage(message);
 
-			await logChannel?.send( Lang.copyLog(member), embed );
+			await logChannel?.send({ ...embed, content: Lang.copyLog(member) });
 			await reaction.remove();
 		}
 		catch
@@ -319,11 +319,11 @@ class MoveMessages extends Plugin.ChatCommand
 			// Send Messages to new Channel
 			for (const embed of embeds)
 			{
-				await message.channel.send("", embed);
+				await message.channel.send(embed);
 			}
 
 			// Delete old Messages
-			messages.forEach( async m => {
+			messages.forEach( async (m: Discord.Message) => {
 
 				try {
 					await m.delete();
@@ -333,11 +333,13 @@ class MoveMessages extends Plugin.ChatCommand
 			});
 
 			// Post Response
-			let attachment = new Discord.MessageAttachment("./img/banner.gif");
 			let sourceChannelId = (this.plugin.state.read( member.id, "start" ) as SelectionMark).channel;
 			let sourceChannel = member.guild.channels.cache.get(sourceChannelId) as Discord.TextChannel;
 
-			await sourceChannel.send( Lang.moved( embeds.length, message.channel as Discord.TextChannel ), attachment );
+			await sourceChannel.send({
+				content: Lang.moved( embeds.length, message.channel as Discord.TextChannel ),
+				files: ["./img/banner.gif"]
+			});
 		}
 		catch
 		{
@@ -385,7 +387,7 @@ class CopyMessages extends Plugin.ChatCommand
 			// Send Messages to new Channel
 			for (const embed of embeds)
 			{
-				await message.channel.send("", embed);
+				await message.channel.send(embed);
 			}
 
 			// Delete Command
@@ -440,11 +442,11 @@ class DeleteMessages extends Plugin.ChatCommand
 			// Send Messages to log-Channel
 			for (const embed of embeds)
 			{
-				await (logChannel as Discord.TextChannel).send("", embed);
+				await (logChannel as Discord.TextChannel).send(embed);
 			}
 
 			// Delete old Messages
-			messages.forEach( m => {
+			messages.forEach( (m: Discord.Message) => {
 
 				m.delete();
 

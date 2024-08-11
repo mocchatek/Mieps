@@ -28,7 +28,7 @@ export enum InputType
 	/** the response as a number */
 	Number,
 
-	/** a list of text items seperated by linebreaks */
+	/** a list of text items separated by line-breaks */
 	TextList,
 
 	/** a list of channel ids in string format */
@@ -91,13 +91,14 @@ async function _queryInput(
 {
 	channel.send(query);
 
-	// this infinite loop is non blocking, becasue it is interrupted by await
+	// this infinite loop is non blocking, because it is interrupted by await
 	while (true)
 	{
-		let msgArr = await channel.awaitMessages(
-			(m: Discord.Message) => m.author == user,
-			{ max: 1, time: timeout }
-		);
+		let msgArr = await channel.awaitMessages({
+			filter: (m: Discord.Message) => m.author == user,
+			max: 1,
+			time: timeout,
+		});
 
 		// no message was posted before timeout
 		if (msgArr.size === 0)
@@ -138,9 +139,9 @@ async function _queryInput(
 				// search for ids
 				try
 				{
-					let memb = await guild.members.fetch( msg.content.trim() );
+					let member = await guild.members.fetch( msg.content.trim() );
 
-					return [ (queryID) ? memb.id : memb, InputReturns.Answered ];
+					return [ (queryID) ? member.id : member, InputReturns.Answered ];
 				}
 				catch {}
 				
@@ -207,19 +208,19 @@ async function _queryInput(
 			case InputType.Channel:
 			{
 				// search for channel mentions
-				let chnl: Discord.TextChannel | Discord.GuildChannel | undefined = msg.mentions.channels?.first();
+				let ch: Discord.TextChannel | Discord.GuildChannel | undefined = msg.mentions.channels?.first();
 
-				if (chnl)
+				if (ch)
 				{
-					return [ (queryID) ? chnl.id : chnl, InputReturns.Answered ];
+					return [ (queryID) ? ch.id : ch, InputReturns.Answered ];
 				}
 
 				// search for channel ids
-				chnl = guild.channels.cache.get( msg.content.trim() );
+				ch = guild.channels.cache.get( msg.content.trim() );
 
-				if (chnl)
+				if (ch)
 				{
-					return [ (queryID) ? chnl.id : chnl, InputReturns.Answered ];
+					return [ (queryID) ? ch.id : ch, InputReturns.Answered ];
 				}
 
 				// no channel found

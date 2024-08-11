@@ -191,13 +191,13 @@ export class PluginManager
 
 		// Find the command
 		let cmd = args.shift() as string;
-		let commannd = this.chatCommands.get(cmd);
+		let command = this.chatCommands.get(cmd);
 
-		if (!commannd) return;
+		if (!command) return;
 
-		// Check for permissons
+		// Check for permissions
 		let memberPerm = this.getHighestMemberPermission(member);
-		let perm = memberPerm >= commannd.permission;
+		let perm = memberPerm >= command.permission;
 
 		// If Member is a User, check they are posting in the right channel
 		if (memberPerm <= Permission.User)
@@ -211,11 +211,11 @@ export class PluginManager
 		// Run the command
 		try
 		{
-			if (perm) await commannd.run(message, args);
+			if (perm) await command.run(message, args);
 		}
 		catch (e)
 		{
-			uncaughtError( this.controlChannel, commannd.name, e as Error, message.content );
+			uncaughtError( this.controlChannel, command.name, e as Error, message.content );
 		}
 
 	}
@@ -236,7 +236,7 @@ export class PluginManager
 
 		if (!member) return;
 
-		// Check for permissons
+		// Check for permissions
 		let memberPerm = this.getHighestMemberPermission(member);
 		let perm = memberPerm >= command.permission;
 
@@ -304,7 +304,7 @@ export class PluginManager
 		try
 		{
 
-			this.joinStreams.forEach( stream => {
+			this.joinStreams.forEach( (stream: MemberStream) => {
 
 				currStream = stream;
 				stream.run(member);
@@ -331,7 +331,7 @@ export class PluginManager
 		try
 		{
 
-			this.leaveStreams.forEach( stream => {
+			this.leaveStreams.forEach( (stream: MemberStream) => {
 
 				currStream = stream;
 				stream.run(member);
@@ -353,18 +353,18 @@ export class PluginManager
 	 */
 	public initiateAll(): void
 	{		
-		this.plugins.forEach( p => {
-			this._initiatePlugin(p);
+		this.plugins.forEach( (plugin: iPlugin) => {
+			this._initiatePlugin(plugin);
 		});
 	}
 
 	/**
 	 * Attempts to activate all plugins.
-	 * Plguins which failed to activate, will be ignored.
+	 * Plugins which failed to activate, will be ignored.
 	 */
 	public activateAll(): void
 	{
-		this.plugins.forEach( plugin => {
+		this.plugins.forEach( (plugin: iPlugin) => {
 			this.activatePlugin( plugin.name );
 		});
 	}
@@ -393,15 +393,13 @@ export class PluginManager
 
 			return true;
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 
 	}
 
 	/**
-	 * Deactive a Plugin, unloading all its commands and processors.
+	 * Deactivate a Plugin, unloading all its commands and processors.
 	 * 
 	 * Returns false, if the Plugin was not found
 	 * 
@@ -418,17 +416,15 @@ export class PluginManager
 
 			return true;
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 
 	}
 
 	/**
 	 * sets whether or not a plugin is configured
 	 * @param name name of plugin to set
-	 * @param configured if the plugin is ocnfigured
+	 * @param configured if the plugin is configured
 	 */
 	public setConfigured(name: string, configured: boolean): void 
 	{
@@ -441,16 +437,7 @@ export class PluginManager
 	 */
 	public getActive(name: string): boolean
 	{
-
-		if (this.pluginState.read(name, "active"))
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-
+		return !!this.pluginState.read(name, "active");
 	}
 
 	/**
@@ -544,15 +531,7 @@ export class PluginManager
 	{
 		let role = this.permissionPlugin.state?.read("config", Permission[permission] ) as string | undefined;
 
-		if (role)
-		{
-			return guild.roles.cache.get(role);
-		}
-		else
-		{
-			return;
-		}
-		
+		return role ? guild.roles.cache.get(role) : undefined;
 	}
 
 	// ========== Private Functions ==========
@@ -620,7 +599,7 @@ export class PluginManager
 
 			if (command.type === CommandType.Emoji)
 			{
-				let commandKey = this.emojiCommands.findKey( c => c.name === command.name );
+				let commandKey = this.emojiCommands.findKey( (c: EmojiCommand) => c.name === command.name );
 				if (commandKey) this.emojiCommands.delete(commandKey);
 			}
 

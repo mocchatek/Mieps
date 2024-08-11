@@ -90,7 +90,7 @@ async function getWarningText(channel: Discord.TextChannel, state: State): Promi
 }
 
 /**
- * attempts to send a warning, and returns sucess
+ * attempts to send a warning, and returns success
  * @param channel 
  * @param warning 
  * @param user 

@@ -50,7 +50,7 @@ interface Topic
 // ========== Functions ==========
 
 /**
- * Constructs a string of avalible roles, excluding aliases
+ * Constructs a string of available roles, excluding aliases
  * @param array Array of roles to construct string from
  */
 function buildRoleString(array: Array<Role>): string
@@ -102,7 +102,7 @@ function addRole(message: Discord.Message, roleName: string, topic: Topic): Role
 		return null;
 	}
 	
-	let role = message.guild?.roles.cache.find( r => r.name === roleObj.role );
+	let role = message.guild?.roles.cache.find( (r: Role) => r.name === roleObj.role );
 	
 	if (!role)
 	{
@@ -121,7 +121,7 @@ function addRole(message: Discord.Message, roleName: string, topic: Topic): Role
  */
 function removeRole(message: Discord.Message, roleName: string): boolean
 {
-	let role = message.member?.roles.cache.find( r => r.name === roleName );
+	let role = message.member?.roles.cache.find( (r: Role) => r.name === roleName );
 	
 	if (role == undefined)
 	{
@@ -134,7 +134,7 @@ function removeRole(message: Discord.Message, roleName: string): boolean
 }
 
 /**
- * Replaces all occurences of "$ROLES" in a string, with actual roles
+ * Replaces all occurrences of "$ROLES" in a string, with actual roles
  * @param messageTxt string to parse
  * @param roles roles to insert
  */
@@ -192,7 +192,7 @@ class SetRole extends Plugin.ChatCommand
 			}
 		}
 		
-		// If no roles were sucessfully set, respond with help text
+		// If no roles were successfully set, respond with help text
 		if (setRoles.length === 0)
 		{
 			channel.send( this.getHelpText() );

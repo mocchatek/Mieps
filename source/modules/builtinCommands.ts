@@ -34,7 +34,7 @@ export class BuiltIn implements iPlugin
 
 /**
  * A text interface to the plugin manager.
- * Can list plugins, activate, and deactive them, or show their commands.
+ * Can list plugins, activate, and deactivate them, or show their commands.
 */
 class PluginCommand extends ChatCommand
 {
@@ -144,8 +144,8 @@ class PluginCommand extends ChatCommand
 				}
 				else
 				{
-					let cCommands = plugin.commands?.filter( p => p.type === CommandType.Chat ) as ChatCommand[] | undefined;
-					let eCommands = plugin.commands?.filter( p => p.type === CommandType.Emoji ) as EmojiCommand[] | undefined;
+					let cCommands = plugin.commands?.filter( (p: ChatCommand) => p.type === CommandType.Chat ) as ChatCommand[] | undefined;
+					let eCommands = plugin.commands?.filter( (p: EmojiCommand) => p.type === CommandType.Emoji ) as EmojiCommand[] | undefined;
 
 					channel.send( Lang.pluginCommandList( args[1], cCommands, eCommands) );
 				}
@@ -165,7 +165,7 @@ class PluginCommand extends ChatCommand
 }
 
 /**
- * list all avalible commands,
+ * list all available commands,
  * or show the help text for one command
  */
 class HelpCommand extends ChatCommand
@@ -195,7 +195,7 @@ class HelpCommand extends ChatCommand
 		let cCommands: Discord.Collection<string, ChatCommand> = new Discord.Collection();
 		let eCommands: Discord.Collection<string, EmojiCommand> = new Discord.Collection();
 
-		this.pM.getChatCommands().forEach( c => {
+		this.pM.getChatCommands().forEach( (c: ChatCommand) => {
 
 			if (c.permission <= perm)
 			{
@@ -204,7 +204,7 @@ class HelpCommand extends ChatCommand
 
 		});
 
-		this.pM.getEmojiCommands().forEach( c => {
+		this.pM.getEmojiCommands().forEach( (c: EmojiCommand) => {
 
 			if (c.permission <= perm && c.emoji)
 			{
@@ -355,7 +355,7 @@ class ConfigCommand extends ChatCommand
 
 		this.pM.setConfigured( plugin.name, true);
 
-		// If plugin is allready active, reload it
+		// If plugin is already active, reload it
 		if (this.pM.getActive( plugin.name ))
 		{
 			this.pM.deactivatePlugin( plugin.name );

@@ -17,7 +17,7 @@ export interface ReadOnlyState
 }
 
 /**
- * Manages a State which is presistent between restarts
+ * Manages a State which is persistent between restarts
  */
 export class State
 {
@@ -48,7 +48,7 @@ export class State
 		}
 		catch (e)
 		{
-			criticalError("Could not read State Directory", e);
+			criticalError("Could not read State Directory", e as Error);
 
 			return;
 		}
@@ -67,8 +67,7 @@ export class State
 			}
 			catch (e)
 			{
-				console.log("Failed to read State");
-				criticalError(e);
+				criticalError("Failed to read State", e as Error);
 
 				return;
 			}
@@ -83,8 +82,7 @@ export class State
 			}
 			catch (e)
 			{
-				console.log("Failed to create State File");
-				criticalError(e);
+				criticalError("Failed to create State File", e as Error);
 
 				return;
 			}
