@@ -38,7 +38,7 @@ catch
 	}
 	catch(e)
 	{
-		criticalError("Failed to create empty config File", e);
+		criticalError("Failed to create empty config File", e as Error);
 	}
 	
 	criticalError(`Please configure the "instance.json" file`);

@@ -146,7 +146,7 @@ export class PluginManager
 		}
 		catch (e) 
 		{
-			criticalError("Failed to Load Plugins", e);
+			criticalError("Failed to Load Plugins", e as Error);
 		}
 
 	}
@@ -215,7 +215,7 @@ export class PluginManager
 		}
 		catch (e)
 		{
-			uncaughtError( this.controlChannel, commannd.name, e, message.content );
+			uncaughtError( this.controlChannel, commannd.name, e as Error, message.content );
 		}
 
 	}
@@ -249,7 +249,7 @@ export class PluginManager
 			}
 			catch (e)
 			{
-				uncaughtError( this.controlChannel, command.name, e);
+				uncaughtError( this.controlChannel, command.name, e as Error);
 			}
 
 		}
@@ -284,7 +284,7 @@ export class PluginManager
 			}
 			catch(e)
 			{
-				uncaughtError( this.controlChannel, stream.name, e);
+				uncaughtError( this.controlChannel, stream.name, e as Error);
 			}
 			
 			proceed = p && proceed;
@@ -314,7 +314,7 @@ export class PluginManager
 		}
 		catch (e)
 		{
-			uncaughtError( this.controlChannel, (currStream) ? currStream.name : "unknown", e);
+			uncaughtError( this.controlChannel, (currStream) ? currStream.name : "unknown", e as Error);
 		}
 
 	}
@@ -341,7 +341,7 @@ export class PluginManager
 		}
 		catch (e)
 		{
-			uncaughtError( this.controlChannel, (currStream) ? currStream.name : "unknown", e);
+			uncaughtError( this.controlChannel, (currStream) ? currStream.name : "unknown", e as Error);
 		}
 
 	}
@@ -574,7 +574,7 @@ export class PluginManager
 			}
 			catch (e)
 			{
-				uncaughtError( this.controlChannel, p.name, e, "initialize");
+				uncaughtError( this.controlChannel, p.name, e as Error, "initialize");
 			}
 		}
 
