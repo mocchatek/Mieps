@@ -1,8 +1,6 @@
 import * as Discord from "discord.js"
 
 import * as Lang from "../lang/embedMaker.js"
-import { EmbedMessage } from "./plugin.js";
-
 
 /**
  * creates a embed from a message
@@ -16,7 +14,7 @@ export async function embedFromMessage(
 	showUserIcon: boolean = true,
 	showUserName: boolean = true,
 	showTimestamp: boolean = true
-): Promise<EmbedMessage>
+): Promise<Discord.MessageCreateOptions>
 {
 	
 	// if the message is another bot embed, copy it
@@ -25,7 +23,7 @@ export async function embedFromMessage(
 		return { embeds: message.embeds.slice(0, 1) };
 	}
 
-	let embed = new Discord.MessageEmbed();
+	let embedBuilder = new Discord.EmbedBuilder();
 
 	// set embeds author
 	let av: string | null = null;
@@ -37,21 +35,21 @@ export async function embedFromMessage(
 
 	if (showUserName)
 	{
-		embed.author = {
+		embedBuilder.setAuthor({
 			name: message.member?.displayName ?? message.author.username,
 			iconURL: av ?? undefined
-		};
+		});
 	}
 	
 	// colorize embed
-	embed = embed.setColor(message.member?.displayColor ?? '#ffffff');
+	embedBuilder = embedBuilder.setColor(message.member?.displayColor ?? '#ffffff');
 
 	// add content
-	embed = embed.setDescription( message.content );
+	embedBuilder = embedBuilder.setDescription( message.content );
 
 	if (showTimestamp)
 	{
-		embed = embed.setTimestamp( message.createdTimestamp );
+		embedBuilder = embedBuilder.setTimestamp( message.createdTimestamp );
 	}
 
 	// fetch reply and add preview text
@@ -86,21 +84,24 @@ export async function embedFromMessage(
 				authorName = replyMsg.author.username;
 			}
 
-			embed = embed.addField(`\u2514\u2500\u25b7 ${ Lang.reply } ${authorName}:`, replyTxt);
+			embedBuilder.addFields({
+				name: `\u2514\u2500\u25b7 ${ Lang.reply } ${authorName}:`,
+				value: replyTxt
+			});
 		}
 	}
 
-	const result = {} as EmbedMessage;
+	const result = {} as Discord.MessageCreateOptions;
 
 	// reattach image
 	let attachment = message.attachments.first();
 
 	if (attachment && (attachment.width || attachment.height))
 	{
-		embed = embed.setImage( `attachment://${attachment.name}` );
+		embedBuilder = embedBuilder.setImage( `attachment://${attachment.name}` );
 		result.files = [ attachment.url ];
 	}
 	
-	result.embeds = [ embed ];
+	result.embeds = [ embedBuilder ];
 	return result;
 }

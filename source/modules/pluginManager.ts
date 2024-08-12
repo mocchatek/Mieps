@@ -57,7 +57,7 @@ export class PluginManager
 	{
 		let c = this.guild.channels.cache.get( this.instanceConfig.control_channel );
 
-		if (!c || c.type !== "text")
+		if (!c?.isTextBased())
 		{
 			criticalError("Control Channel not found!");
 
@@ -482,7 +482,7 @@ export class PluginManager
 
 			case Permission.Admin:
 			{
-				return member.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR);
+				return member.permissions.has(Discord.PermissionFlagsBits.Administrator);
 			}
 			break;
 

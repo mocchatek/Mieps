@@ -208,7 +208,7 @@ async function _queryInput(
 			case InputType.Channel:
 			{
 				// search for channel mentions
-				let ch: Discord.TextChannel | Discord.GuildChannel | undefined = msg.mentions.channels?.first();
+				let ch: Discord.Channel | Discord.DMChannel | undefined = msg.mentions.channels?.first();
 
 				if (ch)
 				{

@@ -144,8 +144,8 @@ class PluginCommand extends ChatCommand
 				}
 				else
 				{
-					let cCommands = plugin.commands?.filter( (p: ChatCommand) => p.type === CommandType.Chat ) as ChatCommand[] | undefined;
-					let eCommands = plugin.commands?.filter( (p: EmojiCommand) => p.type === CommandType.Emoji ) as EmojiCommand[] | undefined;
+					let cCommands = plugin.commands?.filter( (p: iCommand) => p.type === CommandType.Chat ) as ChatCommand[] | undefined;
+					let eCommands = plugin.commands?.filter( (p: iCommand) => p.type === CommandType.Emoji ) as EmojiCommand[] | undefined;
 
 					channel.send( Lang.pluginCommandList( args[1], cCommands, eCommands) );
 				}

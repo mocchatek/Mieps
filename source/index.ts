@@ -63,11 +63,11 @@ if (instanceConfig.api_key === "" || instanceConfig.control_channel === "")
 // create client and connect
 const client = new Discord.Client({
 	intents: [
-		Discord.Intents.FLAGS.GUILDS,
-		Discord.Intents.FLAGS.GUILD_MEMBERS,
-		Discord.Intents.FLAGS.GUILD_MESSAGES,
-		Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-		Discord.Intents.FLAGS.MESSAGE_CONTENT
+		Discord.GatewayIntentBits.Guilds,
+		Discord.GatewayIntentBits.GuildMembers,
+		Discord.GatewayIntentBits.GuildMessages,
+		Discord.GatewayIntentBits.GuildMessageReactions,
+		Discord.GatewayIntentBits.MessageContent
 	]
 });
 
@@ -132,14 +132,37 @@ client.on("messageReactionAdd", async (reaction, user) => {
 		}
 	}
 
-	if (user.bot || reaction.message.channel.type !== "GUILD_TEXT") return;
+	if (user.bot || !reaction.message.channel.isTextBased()) return;
 	
 	pluginManager.runEmojiCommand(reaction, user as Discord.User);
 
 });
 
-client.on("guildMemberAdd", pluginManager.runJoinStreams);
-client.on("guildMemberRemove", pluginManager.runLeaveStreams);
+client.on("guildMemberAdd", async (member) => {
+	if (member.partial) {
+		try {
+			member = await member.fetch();
+		} catch (error) {
+			console.error('Something went wrong when fetching the member: ', error);
+			return;
+		}
+	}
+
+	pluginManager.runJoinStreams(member);
+});
+
+client.on("guildMemberRemove", async (member) => {
+	if (member.partial) {
+		try {
+			member = await member.fetch();
+		} catch (error) {
+			console.error('Something went wrong when fetching the member: ', error);
+			return;
+		}
+	}
+
+	pluginManager.runLeaveStreams(member);
+});
 
 // trigger Reactions for uncached messages
 // @ts-ignore: Argument type error
@@ -162,13 +185,14 @@ client.on("raw", async (packet) => {
 	}
 
 	// if it's not a text channel, abort as well
-	if (channel.type !== "GUILD_TEXT") return;
+	if (!channel.isTextBased()) return;
 
     // there's no need to emit if the message is cached, because the event will fire anyway for that
 	if (channel.messages.cache.has( packet.d.message_id )) return;
 	
 	// fetch and cache message
-	let message = await channel.messages.fetch( packet.d.message_id, {
+	let message = await channel.messages.fetch({
+		message: packet.d.message_id,
 		cache: true,
 	});
 

@@ -26,12 +26,6 @@ export enum CommandType
 	Emoji
 }
 
-export interface EmbedMessage
-{
-	embeds: Array<Discord.MessageEmbed>;
-	files?: string[];
-}
-
 /** processes all incoming messages */
 export interface MessageStream
 {

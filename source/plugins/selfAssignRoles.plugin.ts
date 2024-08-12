@@ -102,7 +102,7 @@ function addRole(message: Discord.Message, roleName: string, topic: Topic): Role
 		return null;
 	}
 	
-	let role = message.guild?.roles.cache.find( (r: Role) => r.name === roleObj.role );
+	let role = message.guild?.roles.cache.find( (r: Discord.Role) => r.name === roleObj.role );
 	
 	if (!role)
 	{
@@ -121,7 +121,7 @@ function addRole(message: Discord.Message, roleName: string, topic: Topic): Role
  */
 function removeRole(message: Discord.Message, roleName: string): boolean
 {
-	let role = message.member?.roles.cache.find( (r: Role) => r.name === roleName );
+	let role = message.member?.roles.cache.find( (r: Discord.Role) => r.name === roleName );
 	
 	if (role == undefined)
 	{

@@ -96,7 +96,7 @@ async function fetchSelected(
 		messages.set( start.id, start );
 
 		// Keep fetching messages, until we have arrived at the last message
-		let current = start;
+		let current: Discord.Message = start;
 
 		while (current.createdTimestamp < end.createdTimestamp)
 		{
@@ -148,9 +148,9 @@ async function removeMarks(state: State, member: Discord.GuildMember): Promise<v
 
 }
 
-async function embedArrayFromMessages(messages: Discord.Collection<string, Discord.Message>): Promise<Plugin.EmbedMessage[]>
+async function embedArrayFromMessages(messages: Discord.Collection<string, Discord.Message>): Promise<Discord.MessageCreateOptions[]>
 {
-	let embeds: Array<Plugin.EmbedMessage> = [];
+	let embeds: Array<Discord.MessageCreateOptions> = [];
 
 	for (const [_, m] of messages)
 	{

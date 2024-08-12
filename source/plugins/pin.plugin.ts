@@ -172,7 +172,7 @@ class Pin extends Plugin.EmojiCommand
 
 		let messages = await fetchMessages(message, author);
 
-		let embeds: Array<Plugin.EmbedMessage> = [];
+		let embeds: Array<Discord.MessageCreateOptions> = [];
 
 		// Iterate the Array backwards, as the order is reversed
 		for (var i = messages.length - 1; i >= 0; i--)
